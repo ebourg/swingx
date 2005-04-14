@@ -21,7 +21,7 @@ public class JXTitledPanelBeanInfo extends SimpleBeanInfo {
         // Here you can add code for customizing the BeanDescriptor.
         beanDescriptor = new BeanDescriptor(JXTitledPanel.class);
         beanDescriptor.setValue("containerDelegate", "getContentContainer");
-        beanDescriptor.setValue("isContainer", Boolean.TRUE);
+//        beanDescriptor.setValue("isContainer", Boolean.TRUE);
         
         return beanDescriptor;     }//GEN-LAST:BeanDescriptor
     
