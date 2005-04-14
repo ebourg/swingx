@@ -1,7 +1,8 @@
 /*
- * MetalTitledPanelUI.java
+ * $Id$
  *
- * Created on April 12, 2005, 11:36 AM
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
 package org.jdesktop.swingx.plaf.metal;
@@ -21,7 +22,7 @@ import org.jdesktop.swingx.plaf.basic.BasicTitledPanelUI;
 
 /**
  *
- * @author rb156199
+ * @author rbair
  */
 public class MetalTitledPanelUI extends BasicTitledPanelUI {
     
