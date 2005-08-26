@@ -7,8 +7,9 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -21,9 +22,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,10 +39,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.BoundAction;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * Simple FindDialog.
@@ -50,15 +53,24 @@ import org.jdesktop.swingx.action.BoundAction;
  * PENDING: need to extract a common dialog.
  * PENDING: the base search widget need not be a dialog!
  * 
+ * @deprecated use SearchFactory.getInstance().showFindDialog() instead
  * @author ??
  * @author Jeanette Winzenburg
  */
 public class JXFindDialog extends JDialog {
 
+    static {
+        // Hack to enforce loading of SwingX framework ResourceBundle
+        LookAndFeelAddons.getAddon();
+    }
+    
     public static final String MATCH_WRAP_ACTION_COMMAND = "wrapSearch";
     public static final String MATCH_BACKWARDS_ACTION_COMMAND = "backwardsSearch";
     public static final String EXECUTE_FIND_ACTION_COMMAND = "executeSearch";
+    public static final String EXECUTE_ACTION_COMMAND = "execute";
     public static final String CLOSE_ACTION_COMMAND = "close";
+    private static final String SEARCH_FIELD_LABEL = "searchFieldLabel";
+    private static final String SEARCH_FIELD_MNEMONIC = SEARCH_FIELD_LABEL + ".mnemonic";
 //    private static final Object ENTER_ACTION_COMMAND = null;
 //    private static final Object CANCEL_ACTION_COMMAND = null;
     
@@ -373,7 +385,13 @@ public class JXFindDialog extends JDialog {
      * 
      */
     private void initComponents() {
-        searchField = new JTextField();
+        searchField = new JTextField(30) {
+            public Dimension getMaximumSize() {
+                Dimension superMax = super.getMaximumSize();
+                superMax.height = getPreferredSize().height;
+                return superMax;
+            }
+        };
         matchCheck = new JCheckBox();
         wrapCheck = new JCheckBox();
         backCheck = new JCheckBox();
@@ -383,24 +401,17 @@ public class JXFindDialog extends JDialog {
 
 
     private void build() {
-        getContentPane().add(createFieldPanel(), BorderLayout.CENTER);
-        getContentPane().add(createButtonPanel(), BorderLayout.SOUTH);
-
-        // Implementation of incremental search
-        /*
-          findText.getDocument().addDocumentListener(new DocumentListener() {
-          public void insertUpdate(DocumentEvent evt) {
-          doFind();
-          }
-
-          public void removeUpdate(DocumentEvent evt) {
-          doFind(true);
-          }
-
-          public void changedUpdate(DocumentEvent evt) {
-          }
-          });
-        */
+        JComponent content = new Box(BoxLayout.PAGE_AXIS); //Box.createVerticalBox();
+        JComponent fieldPanel = createFieldPanel();
+        content.add(fieldPanel);
+        JComponent buttonPanel = createButtonPanel();
+        content.add(buttonPanel);
+        content.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+//        content.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        
+//        fieldPanel.setAlignmentX();
+//      buttonPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        add(content);
     }
 
     /**
@@ -409,25 +420,28 @@ public class JXFindDialog extends JDialog {
     private JComponent createFieldPanel() {
 
         // Create components
-        JLabel label = new JLabel("Find Text: ");
-        label.setDisplayedMnemonicIndex(2);
+        JLabel label = new JLabel(getUIString(SEARCH_FIELD_LABEL));
+        String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC);
+        if (mnemonic != SEARCH_FIELD_MNEMONIC) {
+            label.setDisplayedMnemonic(mnemonic.charAt(0));
+        }
         label.setLabelFor(searchField);
 
-        Box lBox = Box.createVerticalBox();
+        Box lBox = new Box(BoxLayout.LINE_AXIS); 
         lBox.add(label);
-        lBox.add(Box.createGlue());
-
-        Box rBox = Box.createVerticalBox();
+        lBox.add(new JLabel(":"));
+        lBox.add(new JLabel("  "));
+//        lBox.add(Box.createGlue());
+        lBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        Box rBox = new Box(BoxLayout.PAGE_AXIS); 
         rBox.add(searchField);
         rBox.add(matchCheck);
         rBox.add(wrapCheck);
         rBox.add(backCheck);
-
-        Box box = Box.createHorizontalBox();
+        rBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        Box box = new Box(BoxLayout.LINE_AXIS);
         box.add(lBox);
         box.add(rBox);
-
-        box.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         return box;
     }
@@ -439,9 +453,15 @@ public class JXFindDialog extends JDialog {
      * 
      * @return
      */
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel();
+    private JComponent createButtonPanel() {
+        JPanel panel = new JPanel(new BasicOptionPaneUI.ButtonAreaLayout(true, 6))
+        {
+            public Dimension getMaximumSize() {
+                return getPreferredSize();
+            }
+        };
 
+        panel.setBorder(BorderFactory.createEmptyBorder(9, 0, 0, 0));
         Action findAction = getAction(EXECUTE_FIND_ACTION_COMMAND);
         Action closeAction = getAction(CLOSE_ACTION_COMMAND);
 
@@ -458,61 +478,9 @@ public class JXFindDialog extends JDialog {
         inputMap.put(escapeKey, CLOSE_ACTION_COMMAND);
 
         getRootPane().setDefaultButton(findButton);
-
-
         return panel;
     }
 
-
-//    public boolean getMatchFlag() {
-//        return matchCheck.isSelected();
-//    }
-
-//    /**
-//     * Public method for testing.
-//     * <p>
-//     * TODO: The state should probably be encapsulated by a model rather
-//     * that within the UI components.
-//     */
-//    public void setMatchFlag(boolean flag) {
-//        matchCheck.setSelected(flag);
-//    }
-
-//    public boolean getWrapFlag() {
-//        return wrapCheck.isSelected();
-//    }
-//
-//    public void setWrapFlag(boolean flag) {
-//        wrapCheck.setSelected(flag);
-//    }
-
-//    public boolean getBackwardsFlag() {
-//        return backCheck.isSelected();
-//    }
-//
-//    public void setBackwardsFlag(boolean flag) {
-//        backCheck.setSelected(flag);
-//    }
-
-
-//    private class FindAction extends AbstractAction {
-//        public FindAction() {
-//            super("Find");
-//        }
-//        public void actionPerformed(ActionEvent evt) {
-//            doFind();
-//        }
-//    }
-
-//    private class CloseAction extends AbstractAction {
-//        public CloseAction() {
-//            super("Close");
-//        }
-//
-//        public void actionPerformed(ActionEvent evt) {
-//            doClose();
-//        }
-//    }
 
     //----------------------- obsolete actions - no longer use
     //----------------------- kept here to remember adding names etc to resources
