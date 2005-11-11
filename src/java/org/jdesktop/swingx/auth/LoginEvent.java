@@ -19,29 +19,26 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.auth;
-
-import java.io.IOException;
 import java.util.EventObject;
-
 /**
  * This is an event object that is passed to login listener methods
  *
  * @author Shai Almog
  */
 public class LoginEvent extends EventObject {
-    private IOException cause;
+    private Exception cause;
     
     public LoginEvent(Object source) {
         this(source, null);
     }
     
     /** Creates a new instance of LoginEvent */
-    public LoginEvent(Object source, IOException cause) {
+    public LoginEvent(Object source, Exception cause) {
         super(source);
         this.cause = cause;
     }
     
-    public IOException getCause() {
+    public Exception getCause() {
         return cause;
     }
 }
