@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 /**

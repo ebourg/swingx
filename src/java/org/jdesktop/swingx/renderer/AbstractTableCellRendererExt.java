@@ -29,7 +29,6 @@ import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
@@ -68,18 +67,10 @@ import javax.swing.table.TableCellRenderer;
  * @see JTable
  * 
  */
-public abstract class AbstractTableCellRendererExt<T extends JComponent> 
+public abstract class AbstractTableCellRendererExt<T extends JComponent> extends AbstractCellRenderer<T, JTable> 
     implements TableCellRenderer, Serializable
 {
 
-    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1); 
-    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
-
-    private Color unselectedForeground; 
-    private Color unselectedBackground; 
-
-    protected T rendererComponent;
-    protected CellContext<JTable> cellContext;
     /**
      * Creates a default table cell renderer.
      */
@@ -87,58 +78,6 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent>
         rendererComponent = createRendererComponent();
         
     }
-    /**
-     * Sets the <code>String</code> object for the cell being rendered to
-     * <code>value</code>.
-     * 
-     * @param value  the string value for this cell; if value is
-     *          <code>null</code> it sets the text value to an empty string
-     * @see JLabel#setText
-     * 
-     */
-    protected abstract void setValue(Object value);
-    
-//    {
-//        rendererLabel.setText((value == null) ? "" : value.toString());
-//    }
-
-    /**
-     * Creates and returns the label to use for rendering.<p>
-     * Here: returns a performance-optimized JXRendererLabel.
-     * 
-     * @return the label to use for rendering.
-     */
-    protected abstract T createRendererComponent();
-
-    private static Border getNoFocusBorder() {
-        if (System.getSecurityManager() != null) {
-            return SAFE_NO_FOCUS_BORDER;
-        } else {
-            return noFocusBorder;
-        }
-    }
-
-    /**
-     * Overrides <code>JComponent.setForeground</code> to assign
-     * the unselected-foreground color to the specified color.
-     * 
-     * @param c set the foreground color to this value
-     */
-    public void setForeground(Color c) {
-        unselectedForeground = c; 
-    }
-    
-    /**
-     * Overrides <code>JComponent.setBackground</code> to assign
-     * the unselected-background color to the specified color.
-     *
-     * @param c set the background color to this value
-     */
-    public void setBackground(Color c) {
-        unselectedBackground = c; 
-    }
-
-    
     // implements javax.swing.table.TableCellRenderer
     /**
      *
@@ -158,109 +97,19 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent>
 
         CellContext<JTable> context = getCellContext();
         context.installContext(table, value, row, column, isSelected, hasFocus, true, true);
-        setValue(value); 
         configureVisuals(context);
+        configureContent(context); 
         return rendererComponent;
     }
-
-    /**
-     * @param context
-     */
-    protected void configureVisuals(CellContext<JTable> context) {
-        configureState(context);
-        configureSelectionDependentColors(context);
-        configureFocusDependentState(context);
-    }
-    /**
-     * @param context
-     */
-    protected void configureState(CellContext<JTable> context) {
-        rendererComponent.setFont(context.getComponent().getFont());
-        rendererComponent.setEnabled(context.getComponent().isEnabled());
-        rendererComponent.setComponentOrientation(context.getComponent().getComponentOrientation());
-    }
-    /**
-     * @param context
-     */
-    protected void configureSelectionDependentColors(CellContext<JTable> context) {
-        if (context.isSelected()) {
-            rendererComponent.setForeground(getSelectionForeground(context));
-            rendererComponent.setBackground(getSelectionBackground(context));
-         }
-         else {
-             rendererComponent.setForeground(getUnselectedForeground(context));
-             rendererComponent.setBackground(getUnselectedBackground(context));
-         }
-        
-    }
-
-    /**
-     * @param context
-     */
-    protected void configureFocusDependentState(CellContext<JTable> context) {
-        if (context.isFocused()) {
-            Border border = null;
-            if (context.isSelected()) {
-                border = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
-            }
-            if (border == null) {
-                border = UIManager.getBorder("Table.focusCellHighlightBorder");
-            }
-            rendererComponent.setBorder(border);
-
-            if (!context.isSelected() && context.isEditable()) {
-                Color col;
-                col = UIManager.getColor("Table.focusCellForeground");
-                if (col != null) {
-                    rendererComponent.setForeground(col);
-                }
-                col = UIManager.getColor("Table.focusCellBackground");
-                if (col != null) {
-                    rendererComponent.setBackground(col);
-                }
-            }
-        } else {
-            rendererComponent.setBorder(getNoFocusBorder());
-        }
-        
-    }
-
-    protected Color getUnselectedForeground(CellContext<JTable> context) {
-        if (unselectedForeground != null) return unselectedForeground;
-        return context.getComponent() != null ? context.getComponent().getForeground() : null;
-    }
     
-    protected Color getUnselectedBackground(CellContext<JTable> context) {
-        if (unselectedBackground != null) return unselectedBackground;
-        return context.getComponent() != null ? context.getComponent().getBackground() : null;
-    }
-    
-    /**
-     * @param context
-     * @return
-     */
-    protected Color getSelectionBackground(CellContext<JTable> context) {
-        return context.getComponent() != null ? context.getComponent().getSelectionBackground() : null;
-    }
-    /**
-     * @param context
-     * @return
-     */
-    protected Color getSelectionForeground(CellContext<JTable> context) {
-        return context.getComponent() != null ? context.getComponent().getSelectionForeground() : null;
-    }
-    /**
-     * 
-     * @return the cell context to use, guaranteed to be <code>not null</code>.
-     */
+    @Override
     protected CellContext<JTable> getCellContext() {
         if (cellContext == null) {
             cellContext = new TableCellContext();
         }
-        return cellContext ;
+        return cellContext;
     }
-    
-  
+
     /**
      * Table specific cellContext.
      */
@@ -270,6 +119,23 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent>
         public boolean isEditable() {
             return getComponent() != null ? getComponent().isCellEditable(getRow(), getColumn()) : false;
         }
+
+        @Override
+        protected Color getSelectionBackground() {
+            return getComponent() != null ? getComponent().getSelectionBackground() : null;
+        }
+
+        @Override
+        protected Color getSelectionForeground() {
+            return getComponent() != null ? getComponent().getSelectionForeground() : null;
+        }
+
+        @Override
+        protected String getUIPrefix() {
+            return "Table.";
+        }
+        
+        
         
     }
     /**
