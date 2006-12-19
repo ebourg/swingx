@@ -21,20 +21,24 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
 /**
  * A RendererController specialized on JTree. 
- * Subclassed to not install borders and to handle icons.<p>
+ * Subclassed to not install borders.<p>
  * 
- * PENDING: move icon handling into RenderingController? Custom icons
- * often are content dependent.
+ * PENDING: the tricksery with borders is an implementation detail of the 
+ * rendering comp - should not ripple to up here. Nevertheless, this 
+ * controller is responsible to reset (in case some Highlighter fiddled 
+ * with it)
  * 
  * @author Jeanette Winzenburg
  */
-public class TreeRendererController<T extends JComponent> extends RendererController<T, JTree> {
+public class TreeRendererController<T extends JComponent> 
+    extends RendererController<T, JTree> {
 
     /**
      * @param componentController
@@ -44,26 +48,8 @@ public class TreeRendererController<T extends JComponent> extends RendererContro
     }
 
     @Override
-    protected void configureState(CellContext<JTree> context) {
-       super.configureState(context);
-       configureIcons(context);
-    }
-
-    /**
-     * @param context
-     */
-    protected void configureIcons(CellContext<JTree> context) {
-        if (!(getRendererComponent() instanceof JLabel)) return;
-         if (context.getComponent().isEnabled()) {
-            ((JLabel) getRendererComponent()).setIcon(context.getIcon());
-        } else {
-            ((JLabel) getRendererComponent()).setDisabledIcon(context.getIcon());
-            
-        }
-    }
-
-    @Override
     protected void configureBorder(CellContext<JTree> context) {
+        getRendererComponent().setBorder(BorderFactory.createEmptyBorder());
     }
 
     
