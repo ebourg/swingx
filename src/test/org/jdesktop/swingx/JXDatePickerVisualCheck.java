@@ -18,6 +18,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -25,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -66,6 +68,12 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         public void actionPerformed(ActionEvent e) {
             try {
                 UIManager.setLookAndFeel(plaf);
+                Window[] windows = Window.getWindows();
+                
+                for (Window w : windows) {
+                    SwingUtilities.updateComponentTreeUI(w);
+                    w.pack();
+                }
             } catch (ClassNotFoundException e1) {
                 e1.printStackTrace();
             } catch (InstantiationException e1) {
