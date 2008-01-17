@@ -41,6 +41,7 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * @author JW
  */
+@Deprecated
 public final class TreeModelSupport {
     protected EventListenerList listeners;
 
