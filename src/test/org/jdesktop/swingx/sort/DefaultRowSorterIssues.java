@@ -37,7 +37,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * TODO add type doc
+ * Test the DefaultRowSorter, to expose facets of core 
+ * <a href=http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6894632>Issue 6894632</a>.
+ * <p>
+ * Compare with DefaultSortControllerTest to see the effect of the fix in SwingX.
  * 
  * @author Jeanette Winzenburg
  */
