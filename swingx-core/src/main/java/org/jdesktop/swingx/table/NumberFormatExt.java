@@ -28,10 +28,15 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 
 /**
- * TODO add type doc
+ * A specialised NumberFormat which handles null values and empty Strings. 
+ * This is useful in cell editors and used in StrictNumberFormatter.
  * 
+ * @author Noel Grandin
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated (pre-1.6.2) moved to org.jdesktop.swingx.text
  */
+@Deprecated
 class NumberFormatExt extends NumberFormat {
     
     private NumberFormat childFormat;
@@ -95,7 +100,6 @@ class NumberFormatExt extends NumberFormat {
     @Override
     public StringBuffer format(long number, StringBuffer toAppendTo,
             FieldPosition pos) {
-        // TODO Auto-generated method stub
         return childFormat.format(number, toAppendTo, pos);
     }
 

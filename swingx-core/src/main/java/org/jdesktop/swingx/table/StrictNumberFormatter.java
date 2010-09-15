@@ -34,7 +34,10 @@ import javax.swing.text.NumberFormatter;
  * number type exceeds its range.
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated (pre-1.6.2) moved to text package
  */
+@Deprecated
 class StrictNumberFormatter extends NumberFormatter {
 
     
