@@ -34,12 +34,4 @@ class DummyPainter extends AbstractPainter<Object> {
     @Override
     protected void doPaint(Graphics2D g, Object obj, int width, int height) {
     }
-
-    @Override
-    protected void validate(Object object) {
-    }
-
-    @Override
-    protected void configureGraphics(Graphics2D g) {
-    }
 }

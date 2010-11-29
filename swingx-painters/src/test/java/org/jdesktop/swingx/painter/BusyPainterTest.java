@@ -20,6 +20,13 @@
  */
 package org.jdesktop.swingx.painter;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.awt.Color;
+
+import org.junit.Test;
+
 
 /**
  * Test for BusyPainter.
@@ -31,5 +38,22 @@ public class BusyPainterTest extends AbstractPainterTest {
     @Override
     protected BusyPainter createTestingPainter() {
         return new BusyPainter();
+    }
+    
+    @Test
+    @Override
+    public void testDefaults() {
+        super.testDefaults();
+        
+        BusyPainter bp = (BusyPainter) p;
+        assertThat(bp.getBaseColor(), is(Color.LIGHT_GRAY));
+        assertThat(bp.getDirection(), is(BusyPainter.Direction.RIGHT));
+        assertThat(bp.getFrame(), is(-1));
+        assertThat(bp.getHighlightColor(), is(Color.BLACK));
+        assertThat(bp.getPoints(), is(8));
+        assertThat(bp.getPointShape(), is(BusyPainter.getScaledDefaultPoint(26)));
+        assertThat(bp.getTrailLength(), is(4));
+        assertThat(bp.getTrajectory(), is(BusyPainter.getScaledDefaultTrajectory(26)));
+        assertThat(bp.isPaintCentered(), is(false));
     }
 }
